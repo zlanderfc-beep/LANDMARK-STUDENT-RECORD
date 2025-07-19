@@ -1,0 +1,89 @@
+[
+  {
+    "student_name": "OKPUN EBAN TAKEM",
+    "roll_number": 2,
+    "SWE210_mark": 78,
+    "MAE101_mark": 90,
+    "SWE200_mark": 88
+  },
+  {
+    "student_name": "OBASE CLINTON EKOLE",
+    "SWE210_mark": 90,
+    "MAE101_mark": 90,
+    "SWE200_mark": 90,
+    "roll_number": 1,
+    "level": "200"
+  },
+  {
+    "student_name": "CHIDALU WISDOM ORIMA",
+    "SWE210_mark": 89,
+    "MAE101_mark": 79,
+    "SWE200_mark": 88,
+    "roll_number": 3,
+    "level": "200"
+  },
+  {
+    "student_name": "NEMBO BETRAND ACHA",
+    "SWE210_mark": 78,
+    "MAE101_mark": 82,
+    "SWE200_mark": 80,
+    "roll_number": 4,
+    "level": "200"
+  },
+  {
+    "student_name": "BACHE LARRY ANNE",
+    "SWE210_mark": 89,
+    "MAE101_mark": 91,
+    "SWE200_mark": 90,
+    "roll_number": 5,
+    "level": "200"
+  },
+  {
+    "student_name": "TAMANJI BENEDICTA",
+    "SWE210_mark": 80,
+    "MAE101_mark": 77,
+    "SWE200_mark": 85,
+    "roll_number": 6,
+    "level": "200"
+  },
+  {
+    "student_name": "MENANG JERKINGS",
+    "SWE210_mark": 80,
+    "MAE101_mark": 85,
+    "SWE200_mark": 82,
+    "roll_number": 7,
+    "level": "200"
+  },
+  {
+    "student_name": "TALETEH NJEM MANYIE PRECIOUS",
+    "SWE210_mark": 90,
+    "MAE101_mark": 92,
+    "SWE200_mark": 89,
+    "roll_number": 8,
+    "level": "200"
+  },
+  {
+    "student_name": "Amabo Bless",
+    "SWE210_mark": 89,
+    "MAE101_mark": 90,
+    "SWE200_mark": 78,
+    "roll_number": 9,
+    "level": "200"
+  },
+  {
+    "student_name": "Ebai Marinette",
+    "SWE210_mark": 67,
+    "MAE101_mark": 55,
+    "SWE200_mark": 48,
+    "roll_number": 10,
+    "level": "200"
+  },
+  {
+    "student_name": "Nduka Jenifer",
+    "SWE210_mark": 89,
+    "MAE101_mark": 78,
+    "SWE200_mark": 88,
+    "roll_number": 12,
+    "level": "200"
+  }
+]

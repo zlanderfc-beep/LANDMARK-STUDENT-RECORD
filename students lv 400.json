@@ -1,0 +1,25 @@
+[
+  {
+    "student_name": "Mbacho Rudolf",
+    "roll_number": 301,
+    "SWE210_mark": 89,
+    "MAE101_mark": 78,
+    "SWE200_mark": 90
+  },
+  {
+    "student_name": "Taku Sylvester",
+    "SWE210_mark": 89,
+    "MAE101_mark": 93,
+    "SWE200_mark": 88,
+    "roll_number": 302,
+    "level": "400"
+  },
+  {
+    "student_name": "Tiku Francis",
+    "SWE210_mark": 87,
+    "MAE101_mark": 78,
+    "SWE200_mark": 90,
+    "roll_number": 303,
+    "level": "400"
+  }
+]

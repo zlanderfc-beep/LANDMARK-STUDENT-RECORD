@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Landmark Student Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="result_style.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #f5f8ff;
+        }
+        .split-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            min-height: 100vh;
+            min-width: 100vw;
+            overflow: hidden;
+        }
+        .left-panel {
+            width: 100vw;
+            min-width: 260px;
+            max-width: 490px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            padding: 0 0 0 0;
+            box-shadow: 2px 0 16px rgba(30,60,114,0.10);
+            position: relative;
+            z-index: 2;
+            animation: slideInLeft 0.8s cubic-bezier(.68,-0.55,.27,1.55);
+            height: 100vh;
+            overflow-y: none;
+        }
+        .home-btn-container {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-top: 24px;
+            margin-bottom: 0;
+            padding-left: 16px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 20;
+        }
+        #homeBtn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            outline: none;
+            transition: transform 0.18s;
+        }
+        #homeBtn svg {
+            width: 38px;
+            height: 38px;
+            fill: #fff;
+            stroke: #fff;
+            transition: transform 0.18s;
+        }
+        #homeBtn:active svg {
+            transform: scale(1.18);
+        }
+        .dashboard-title {
+            color: #fff;
+            font-size: 2em;
+            font-weight: 700;
+            margin: 72px 0 24px 0;
+            text-align: center;
+            animation: dashboardScale 2.2s infinite alternate cubic-bezier(.68,-0.55,.27,1.55);
+            letter-spacing: 2px;
+        }
+        @keyframes dashboardScale {
+            0% { transform: scale(1);}
+            100% { transform: scale(1.12);}
+        }
+        .container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            margin-top: 0;
+            padding: 0 16px 24px 32px;
+            box-sizing: border-box;
+            flex: 1 1 auto;
+            overflow-y: auto;
+        }
+        .action-btn {
+            width: 100%;
+            background: #fff;
+            color: #1a237e;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 0;
+            font-size: 1.08em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.18s;
+            box-shadow: 0 2px 8px rgba(30,60,114,0.04);
+            margin-top: 20px;
+        }
+        .action-btn:hover {
+            background: #2a5298;
+            color: #fff;
+            transform: scale(1.04);
+        }
+        .back-btn {
+            margin-top: 24px;
+            width: 100%;
+            background: #fff;
+            color: #1a237e;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 28px 12px 18px;
+            font-size: 1.08em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 12px rgba(30,60,114,0.13);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.18s;
+            z-index: 10;
+            justify-content: center;
+        }
+        .back-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: #1a237e;
+            margin-right: 4px;
+        }
+        .back-btn:hover {
+            background: #e3e8f7;
+            color: #1a237e;
+            transform: scale(1.04);
+        }
+        .right-panel {
+            flex: 1;
+            background: #f5f8ff;
+            position: relative;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeInRight 1.1s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        .right-panel-content {
+            width: 90%;
+            max-width: 700px;
+            min-height: 400px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .watermark-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 320px;
+            height: 320px;
+            opacity: 0.10;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+        #mainSheet {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            min-height: 120px;
+            margin-top: 24px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(30,60,114,0.07);
+            padding: 24px 18px;
+            font-size: 1.08em;
+            animation: popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(40px);}
+            100% { opacity: 1; transform: scale(1) translateY(0);}
+        }
+        #downloadSection {
+            z-index: 2;
+        }
+        #mainSheet h2 {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+            color: #1a237e;
+        }
+        #mainSheet table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            background: rgba(30,60,114,0.07);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #mainSheet th, #mainSheet td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #e3e8f7;
+            color: #1a237e;
+        }
+        #mainSheet th {
+            background: #1a237e;
+            color: #fff;
+            font-size: 1.08em;
+            font-weight: 700;
+        }
+        #mainSheet tr:last-child td {
+            border-bottom: none;
+        }
+        #mainSheet .lec-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a237e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-right: 8px;
+        }
+        .scroll-table-container {
+            max-height: 420px; /* 8 rows x ~50px each + header */
+            overflow-y: auto;
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        #mainSheet table {
+            margin: 0;
+        }
+        @media (max-width: 900px) {
+            .split-layout {
+                flex-direction: column;
+            }
+            .left-panel {
+                width: 100vw;
+                max-width: none;
+                min-width: 0;
+                flex-direction: row;
+                justify-content: center;
+                align-items: flex-start;
+                min-height: 180px;
+                box-shadow: none;
+                padding: 0 0 0 0;
+                height: auto;
+            }
+            .container {
+                width: 100vw;
+                align-items: center;
+                justify-content: flex-start;
+            }
+            .right-panel {
+                min-height: 400px;
+            }
+        }
+        @media (max-width: 600px) {
+            .right-panel-content {
+                width: 99vw;
+                padding: 0 2vw;
+            }
+            .watermark-bg {
+                width: 180px;
+                height: 180px;
+            }
+            .back-btn {
+                width: 80vw;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="split-layout">
+        <div class="left-panel">
+            <div class="home-btn-container">
+                <button id="homeBtn" title="Home">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M3 11.5L12 4l9 7.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M5 10.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <h1 class="dashboard-title">My Dashboard</h1>
+            <div class="container">
+                <button class="action-btn" id="autoSearchBtn">Show My Results</button>
+                <button class="action-btn" id="resitBtn">Resit Course</button>
+                <!-- New Class List button -->
+                <button class="action-btn" id="classListBtn">Class List</button>
+                <button class="action-btn" id="schoolLecturersBtn">My Lecturers</button>
+                <button class="back-btn" id="backToVerificationBtn">
+                    <svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke="#1a237e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                    Back to Student Verification
+                </button>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="right-panel-content">
+                <img src="landmark logo 2.png" class="watermark-bg" alt="Watermark">
+                <div id="mainSheet"></div>
+                <div id="downloadSection" style="display:none; margin-top: 20px; text-align:center;">
+                    <button id="downloadBtn" class="download-animated">Download</button>
+                    <div id="downloadOptions" class="download-options" style="display:none;">
+                        <button onclick="downloadStudentRecord('jpg')">JPG</button>
+                        <button onclick="downloadStudentRecord('png')">PNG</button>
+                        <button onclick="downloadStudentRecord('pdf')">PDF</button>
+                        <button onclick="downloadStudentRecord('bmp')">Bitmap</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Utility: Get student info and file from sessionStorage
+        function getStudentInfo() {
+            return {
+                roll_number: sessionStorage.getItem('studentRollNumber'),
+                file: sessionStorage.getItem('studentSelectedFile')
+            };
+        }
+
+        // Show My Results
+        document.getElementById('autoSearchBtn').onclick = async function() {
+            const { roll_number, file } = getStudentInfo();
+            const mainSheet = document.getElementById('mainSheet');
+            const downloadSection = document.getElementById('downloadSection');
+            mainSheet.innerHTML = '';
+            if (!roll_number || !file) {
+                mainSheet.innerHTML = "<span style='color:red;'>Student info not found. Please login again.</span>";
+                downloadSection.style.display = "none";
+                return;
+            }
+            try {
+                const response = await fetch(`http://localhost:5500/api/student-search-file`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ roll_number, file })
+                });
+                if (!response.ok) throw new Error('Student not found');
+                const student = await response.json();
+                // Calculate average and GPA
+                const marks = [student.SWE210_mark, student.MAE101_mark, student.SWE200_mark];
+                const avg = (marks.reduce((a, b) => a + b, 0) / marks.length).toFixed(2);
+                let gpa = 1;
+                if (avg >= 90) gpa = 4;
+                else if (avg >= 80) gpa = 3;
+                else if (avg >= 70) gpa = 2;
+                // Show result
+                mainSheet.innerHTML = `
+                    <div id="studentRecordPrint">
+                        <img src="landmark logo 2.png" class="watermark" alt="Watermark">
+                        <div class="header">
+                            <img src="landmark logo 2.png" alt="Landmark Logo">
+                            <h2>LANDMARK METROPOLITAN UNIVERSITY INSTITUTE</h2>
+                            <div class="info">
+                                landmark@gmail.com<br>
+                                Malingo street, Buea, Cameroon
+                            </div>
+                        </div>
+                        <table>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>SWE210</th>
+                                <th>MAE101</th>
+                                <th>SWE200</th>
+                            </tr>
+                            <tr>
+                                <td>${student.student_name}</td>
+                                <td>${student.roll_number}</td>
+                                <td>${student.SWE210_mark}</td>
+                                <td>${student.MAE101_mark}</td>
+                                <td>${student.SWE200_mark}</td>
+                            </tr>
+                        </table>
+                        <div class="summary">
+                            Average: <b>${avg}</b> &nbsp; | &nbsp; GPA: <b>${gpa}</b>
+                        </div>
+                    </div>
+                `;
+                downloadSection.style.display = "block";
+            } catch (err) {
+                mainSheet.innerHTML = "<span style='color:red;'>Student not found.</span>";
+                downloadSection.style.display = "none";
+            }
+            document.getElementById('downloadOptions').style.display = "none";
+            mainSheet.style.animation = "none";
+            void mainSheet.offsetWidth; // trigger reflow for animation
+            mainSheet.style.animation = "popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55)";
+        };
+
+        // Resit Course
+        document.getElementById('resitBtn').onclick = async function() {
+            const { roll_number, file } = getStudentInfo();
+            const mainSheet = document.getElementById('mainSheet');
+            mainSheet.innerHTML = '';
+            if (!roll_number || !file) {
+                mainSheet.innerHTML = "<span style='color:red;'>Student info not found. Please login again.</span>";
+                return;
+            }
+            try {
+                const response = await fetch(`http://localhost:5500/api/student-search-file`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ roll_number, file })
+                });
+                if (!response.ok) throw new Error('Student not found');
+                const student = await response.json();
+                const resitCourses = [];
+                if (student.SWE210_mark < 49) resitCourses.push("SWE210");
+                if (student.MAE101_mark < 49) resitCourses.push("MAE101");
+                if (student.SWE200_mark < 49) resitCourses.push("SWE200");
+                if (resitCourses.length === 0) {
+                    mainSheet.innerHTML = `<span style="color:green; font-weight:600;">No course to resit.</span>`;
+                } else {
+                    mainSheet.innerHTML = `
+                        <h2>Resit Courses</h2>
+                        <ul style="font-size:1.15em; color:#b71c1c; font-weight:600; text-align:left;">
+                            ${resitCourses.map(c => `<li>${c}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+            } catch (err) {
+                mainSheet.innerHTML = "<span style='color:red;'>Student not found or error loading courses.</span>";
+            }
+            mainSheet.style.animation = "none";
+            void mainSheet.offsetWidth;
+            mainSheet.style.animation = "popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55)";
+        };
+
+        // My Lecturers
+        document.getElementById('schoolLecturersBtn').onclick = async function() {
+            const mainSheet = document.getElementById('mainSheet');
+            mainSheet.innerHTML = "<div style='text-align:center;font-size:1.2em;'>Loading lecturers...</div>";
+            document.getElementById('downloadSection').style.display = "none";
+            try {
+                const res = await fetch('http://localhost:5500/api/lecturers');
+                const lecturers = await res.json();
+                if (!Array.isArray(lecturers) || lecturers.length === 0) {
+                    mainSheet.innerHTML = "<div style='text-align:center;color:#1a237e;'>No lecturers found.</div>";
+                    return;
+                }
+                mainSheet.innerHTML = `
+                    <h2>School Lecturers</h2>
+                    <div class="scroll-table-container">
+                        <table>
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Email</th>
+                            </tr>
+                            ${lecturers.map((lec, i) => `
+                                <tr>
+                                    <td><div class="lec-icon">${lec.lec_name ? lec.lec_name.charAt(0).toUpperCase() : '?'}</div></td>
+                                    <td>${lec.lec_name || ''}</td>
+                                    <td>${lec.signin_email || ''}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+                `;
+            } catch {
+                mainSheet.innerHTML = "<div style='text-align:center;color:#1a237e;'>Error loading lecturers.</div>";
+            }
+            mainSheet.style.animation = "none";
+            void mainSheet.offsetWidth;
+            mainSheet.style.animation = "popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55)";
+        };
+
+        // Class List button logic
+        document.getElementById('classListBtn').onclick = async function() {
+            const file = sessionStorage.getItem('studentSelectedFile');
+            const mainSheet = document.getElementById('mainSheet');
+            mainSheet.innerHTML = "<div style='text-align:center;font-size:1.2em;'>Loading class list...</div>";
+
+            if (!file) {
+                mainSheet.innerHTML = "<div style='color:red;'>No student file found for your roll number.</div>";
+                return;
+            }
+
+            try {
+                const res = await fetch(`http://localhost:5500/api/class-list?file=${encodeURIComponent(file)}`);
+                const students = await res.json();
+                if (!Array.isArray(students) || students.length === 0) {
+                    mainSheet.innerHTML = "<div style='text-align:center;color:#1a237e;'>No students found.</div>";
+                    return;
+                }
+                // Display only student name and roll number in a table with scroll if >8
+                mainSheet.innerHTML = `
+                    <h2>Class List</h2>
+                    <div class="scroll-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Name</th>
+                                    <th>Roll Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${students.map(stu => `
+                                    <tr>
+                                        <td><div class="lec-icon">${stu.student_name ? stu.student_name.charAt(0).toUpperCase() : '?'}</div></td>
+                                        <td>${stu.student_name || ''}</td>
+                                        <td>${stu.roll_number || ''}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch {
+                mainSheet.innerHTML = "<div style='text-align:center;color:#1a237e;'>Error loading class list.</div>";
+            }
+            mainSheet.style.animation = "none";
+            void mainSheet.offsetWidth;
+            mainSheet.style.animation = "popIn 0.7s cubic-bezier(.68,-0.55,.27,1.55)";
+        };
+
+        // Back to Student Verification
+        document.getElementById('backToVerificationBtn').onclick = function() {
+            window.location.href = "student_confirm.html";
+        };
+
+        // Download button logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadOptions = document.getElementById('downloadOptions');
+            if (downloadBtn) {
+                downloadBtn.onclick = function() {
+                    downloadOptions.style.display = downloadOptions.style.display === "none" ? "flex" : "none";
+                };
+            }
+        });
+
+        // Download function for different formats (unchanged)
+        function downloadStudentRecord(format) {
+            const node = document.getElementById('studentRecordPrint') || document.getElementById('mainSheet');
+            if (!node) return;
+
+            html2canvas(node, {
+                backgroundColor: "#fff",
+                scale: 2, // High quality
+                useCORS: true
+            }).then(canvas => {
+                if (format === 'jpg' || format === 'png' || format === 'bmp') {
+                    let mime = 'image/png';
+                    if (format === 'jpg') mime = 'image/jpeg';
+                    if (format === 'bmp') mime = 'image/bmp';
+                    const link = document.createElement('a');
+                    link.download = `student_record.${format}`;
+                    link.href = canvas.toDataURL(mime);
+                    link.click();
+                } else if (format === 'pdf') {
+                    // Make PDF page size exactly match the canvas size in pixels (1pt = 1px)
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new window.jspdf.jsPDF({
+                        orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                        unit: 'px',
+                        format: [canvas.width, canvas.height]
+                    });
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                    pdf.save('student_record.pdf');
+                }
+            });
+        }
+
+        // Home button logic
+        document.getElementById('homeBtn').onclick = function() {
+            this.querySelector('svg').style.transform = 'scale(1.18)';
+            setTimeout(() => {
+                window.location.href = "LSMS_Landing.html";
+            }, 120);
+        };
+    </script>
+</body>
+</html>

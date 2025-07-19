@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Identification</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            min-width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+        .student-id-container {
+            position: relative;
+            background: rgba(255,255,255,0.97);
+            width: 500px;
+            max-width: 98vw;
+            min-height: 420px;
+            margin: 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(30,60,114,0.22);
+            padding: 36px 36px 32px 36px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1s cubic-bezier(.68,-0.55,.27,1.55);
+            justify-content: center;
+        }
+        .student-id-container h1 {
+            text-align: center;
+            color: #4e54c8;
+            margin-bottom: 28px;
+            letter-spacing: 2px;
+            font-size: 2em;
+            font-weight: 800;
+            animation: fadeInDown 1.1s;
+        }
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-40px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        .student-id-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .student-id-form input, .student-id-form select {
+            width: 100%;
+            margin: 14px 0;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 7px;
+            border: 1.5px solid #b0c4de;
+            transition: border 0.2s, box-shadow 0.2s;
+            background: #f7fafd;
+            box-shadow: 0 2px 8px rgba(30,60,114,0.04);
+        }
+        .student-id-form input:focus, .student-id-form select:focus {
+            border: 1.5px solid #1e3c72;
+            outline: none;
+            box-shadow: 0 4px 16px rgba(30,60,114,0.09);
+        }
+        .confirm-btn {
+            width: 100%;
+            background: #1e3c72;
+            color: #fff;
+            border: none;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 7px;
+            padding: 13px 0;
+            margin-top: 18px;
+            cursor: pointer;
+            transition: background 0.25s, transform 0.18s, box-shadow 0.2s, opacity 0.2s;
+            box-shadow: 0 2px 8px rgba(30,60,114,0.09);
+            letter-spacing: 1px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .confirm-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .confirm-btn:hover, .confirm-btn:focus {
+            background: #2a5298;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 24px rgba(30,60,114,0.13);
+        }
+        .home-btn-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        .home-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 10;
+            transition: transform 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .home-btn svg {
+            width: 38px;
+            height: 38px;
+            display: block;
+            background: none; /* Ensure no background */
+            transition: none;  /* Remove any transition that could cause color fill */
+        }
+        .home-btn:focus {
+            outline: none;
+        }
+        .home-btn:active,
+        .home-btn.scaled,
+        .home-btn:hover {
+            transform: scale(1.05);
+            background: none !important; /* Prevent any background on hover/click */
+            box-shadow: none !important;  /* Prevent any shadow on hover/click */
+        }
+        @media (max-width: 600px) {
+            .student-id-container {
+                width: 98vw;
+                min-width: 0;
+                padding: 18px 4vw 32px 4vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="student-id-container">
+        <div class="home-btn-wrapper">
+            <button class="home-btn" id="homeBtn" title="Home" type="button">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M3 11.5L12 4l9 7.5" stroke="#1a237e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5 10.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9.5" stroke="#1a237e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        <form class="student-id-form" autocomplete="off">
+            <h1>Student Identification</h1>
+            <input type="text" id="studentName" name="studentName" placeholder="Student Full Name" required autocomplete="off">
+            <select id="fieldOfStudies" name="fieldOfStudies" required>
+                <option value="" disabled selected>Select Field of Studies</option>
+                <option value="HND">HND</option>
+                <option value="Btech">Btech</option>
+            </select>
+            <input type="number" id="rollNumber" name="rollNumber" placeholder="Roll Number" min="1" required>
+            <button type="submit" class="confirm-btn" id="confirmBtn" disabled>Confirm</button>
+            <div id="studentMsg" style="margin-top:16px;font-size:1.08em;"></div>
+        </form>
+    </div>
+    <script>
+        // Home button logic with scale effect
+        const homeBtn = document.getElementById('homeBtn');
+        homeBtn.onclick = function() {
+            homeBtn.classList.add('scaled');
+            setTimeout(() => {
+                window.location.href = "LSMS_Landing.html";
+            }, 120);
+        };
+        homeBtn.onmousedown = function() {
+            homeBtn.classList.add('scaled');
+        };
+        homeBtn.onmouseup = function() {
+            homeBtn.classList.remove('scaled');
+        };
+        homeBtn.onmouseleave = function() {
+            homeBtn.classList.remove('scaled');
+        };
+
+        // Enable confirm button only when all fields are filled
+        const studentName = document.getElementById('studentName');
+        const fieldOfStudies = document.getElementById('fieldOfStudies');
+        const rollNumber = document.getElementById('rollNumber');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const studentMsg = document.getElementById('studentMsg');
+
+        function checkFormFilled() {
+            if (
+                studentName.value.trim() !== "" &&
+                fieldOfStudies.value !== "" &&
+                rollNumber.value.trim() !== ""
+            ) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.add('active');
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.remove('active');
+            }
+        }
+
+        studentName.addEventListener('input', checkFormFilled);
+        fieldOfStudies.addEventListener('change', checkFormFilled);
+        rollNumber.addEventListener('input', checkFormFilled);
+
+        // Form submission: compare name and roll number in all student lv files
+        document.querySelector('.student-id-form').onsubmit = async function(e) {
+            e.preventDefault();
+            studentMsg.textContent = "";
+            studentMsg.style.color = "";
+
+            const name = studentName.value.trim();
+            const roll = rollNumber.value.trim();
+
+            if (!name || !roll) {
+                studentMsg.textContent = "Please fill all fields.";
+                studentMsg.style.color = "red";
+                return;
+            }
+
+            try {
+                // Call backend endpoint to compare name and roll number in all files
+                const res = await fetch("http://localhost:5500/api/student-validate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, roll_number: roll })
+                });
+                const data = await res.json();
+                if (data.status === "not_found") {
+                    studentMsg.textContent = "Student not found";
+                    studentMsg.style.color = "red";
+                } else if (data.status === "roll_mismatch") {
+                    studentMsg.textContent = "Roll number mismatched";
+                    studentMsg.style.color = "red";
+                } else if (data.status === "invalid") {
+                    studentMsg.textContent = "Invalid Entries! Re-enter";
+                    studentMsg.style.color = "red";
+                } else if (data.status === "success") {
+                    studentMsg.textContent = "Student verified successfully!";
+                    studentMsg.style.color = "green";
+                    this.reset();
+                    checkFormFilled();
+                    // After successful verification in Student_confirm.html
+                    sessionStorage.setItem('studentName', name);
+                    sessionStorage.setItem('studentRollNumber', roll);
+                    sessionStorage.setItem('studentFoundFile', data.foundFile);
+                    window.location.href = "student_select.html";
+                } else {
+                    studentMsg.textContent = "An error occurred. Try again.";
+                    studentMsg.style.color = "red";
+                }
+            } catch (err) {
+                studentMsg.textContent = "Server error. Try again.";
+                studentMsg.style.color = "red";
+            }
+        };
+
+        async function verifyStudentAndStoreFile(studentName, rollNumber) {
+            // List of possible student files
+            const files = [
+                "students lv 200.json",
+                "students lv 300.json",
+                "students lv 400.json"
+            ];
+            let foundFile = null;
+            for (const file of files) {
+                const res = await fetch(`/api/class-list?file=${encodeURIComponent(file)}`);
+                if (!res.ok) continue;
+                const students = await res.json();
+                if (students.some(s => 
+                    s.student_name?.toLowerCase() === studentName.toLowerCase() && 
+                    s.roll_number?.toLowerCase() === rollNumber.toLowerCase()
+                )) {
+                    foundFile = file;
+                    break;
+                }
+            }
+            if (foundFile) {
+                sessionStorage.setItem('studentSelectedFile', foundFile);
+                // Optionally, store the student name and roll number as well
+                sessionStorage.setItem('studentName', studentName);
+                sessionStorage.setItem('studentRollNumber', rollNumber);
+                // Redirect to student front end view
+                window.location.href = "student front end view.html";
+            } else {
+                alert("Student not found in any level file.");
+            }
+        }
+
+        // Call this function after your form verification, passing the entered name and roll number
+        // verifyStudentAndStoreFile(enteredName, enteredRollNumber);
+
+        // Initial check
+        checkFormFilled();
+    </script>
+</body>
+</html>

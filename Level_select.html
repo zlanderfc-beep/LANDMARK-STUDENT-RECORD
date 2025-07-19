@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Level</title>
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: white;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .level-container {
+            background: #fff;
+            border-radius: 22px;
+            box-shadow: 0 8px 40px rgba(26,35,126,0.18);
+            padding: 48px 36px 80px 36px;
+            min-width: 470px;
+            width: 790px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            animation: popIn 1s cubic-bezier(.68,-0.55,.27,1.55);
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(60px);}
+            100% { opacity: 1; transform: scale(1) translateY(0);}
+        }
+        .level-container h1 {
+            color:  #4e54c8;
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 38px;
+            letter-spacing: 1px;
+            text-align: center;
+            animation: fadeInDown 1.1s;
+        }
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-40px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        .level-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            width: 100%;
+            align-items: center;
+        }
+        .level-btn {
+            width: 600px;
+            max-width: 90vw;
+            background: #fff;
+            color: #1a237e;
+            border: 1px solid #1a237e;
+            border-radius: 12px;
+            padding: 22px 0;
+            font-size: 1.25em;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(26,35,126,0.07);
+            transition: background 0.3s, color 0.3s, border 0.3s, transform 0.18s;
+            outline: none;
+            position: relative;
+            animation: fadeInUp 1.2s;
+        }
+        .level-btn.selected {
+            background: #2ecc40;
+            color: #fff;
+            border-color: #2ecc40;
+            transform: scale(1.03);
+            box-shadow: 0 8px 32px rgba(46,204,64,0.13);
+        }
+        .level-btn.inactive {
+            background: #f1f1f1;
+            color: #b0b0b0;
+            border-color: #e0e0e0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(40px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        .arrow-btn {
+            position: absolute;
+            bottom: 28px;
+            right: 36px;
+            background: #1a237e;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: 0 4px 18px rgba(26,35,126,0.13);
+            transition: background 0.3s, opacity 0.3s, transform 0.18s;
+            z-index: 2;
+            outline: none;
+            animation: fadeInArrow 1.3s;
+        }
+        .arrow-btn.active {
+            cursor: pointer;
+            opacity: 1;
+            background: #1a237e;
+            transform: scale(1.08);
+            box-shadow: 0 8px 32px rgba(26,35,126,0.18);
+        }
+        .arrow-btn:active.active {
+            transform: scale(0.96);
+        }
+        .arrow-btn svg {
+            width: 32px;
+            height: 32px;
+            fill: #fff;
+            display: block;
+        }
+        @keyframes fadeInArrow {
+            0% { opacity: 0; transform: scale(0.7);}
+            100% { opacity: 0.5; transform: scale(1);}
+        }
+        @media (max-width: 500px) {
+            .level-container {
+                min-width: 0;
+                padding: 24px 4vw 80px 4vw;
+            }
+            .level-btn {
+                width: 98vw;
+                min-width: 0;
+                font-size: 1em;
+            }
+            .arrow-btn {
+                right: 16px;
+                bottom: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="level-container">
+        <h1>Select the level to perform a task?</h1>
+        <div class="level-btns">
+            <button class="level-btn" id="level200">Level 200 Btech</button>
+            <button class="level-btn" id="level300">Level 300 Btech</button>
+            <button class="level-btn" id="level400">Level 400 Btech</button>
+        </div>
+        <button class="arrow-btn" id="arrowBtn" disabled title="Proceed">
+            <svg viewBox="0 0 24 24">
+                <!-- Right arrow SVG -->
+                <path d="M10 17l5-5-5-5v10z"/>
+            </svg>
+        </button>
+    </div>
+    <script>
+        const levelBtns = Array.from(document.querySelectorAll('.level-btn'));
+        const arrowBtn = document.getElementById('arrowBtn');
+        let selectedBtn = null;
+        let selectedLevel = null;
+
+        levelBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // If already selected, unselect
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    selectedBtn = null;
+                    selectedLevel = null;
+                    levelBtns.forEach(b => {
+                        b.classList.remove('inactive');
+                        b.disabled = false;
+                    });
+                    arrowBtn.classList.remove('active');
+                    arrowBtn.disabled = true;
+                } else {
+                    // Mark this as selected, others as inactive
+                    levelBtns.forEach(b => {
+                        b.classList.remove('selected', 'inactive');
+                        b.disabled = false;
+                    });
+                    this.classList.add('selected');
+                    selectedBtn = this;
+                    selectedLevel = this.id.replace('level', '');
+                    // Make others inactive
+                    levelBtns.filter(b => b !== this).forEach(b => {
+                        b.classList.add('inactive');
+                        b.disabled = true;
+                    });
+                    // Enable arrow button
+                    arrowBtn.classList.add('active');
+                    arrowBtn.disabled = false;
+                }
+            });
+        });
+
+        arrowBtn.addEventListener('click', function() {
+            if (!selectedLevel) return;
+            // Store selected level in localStorage
+            localStorage.setItem('selectedLevel', selectedLevel);
+            // Redirect to the next page
+            window.location.href = "landmark front view.html";
+        });
+    </script>
+</body>
+</html>

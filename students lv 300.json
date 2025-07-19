@@ -1,0 +1,34 @@
+[
+  {
+    "student_name": "Acha Marinus",
+    "SWE210_mark": 87,
+    "MAE101_mark": 90,
+    "SWE200_mark": 88,
+    "roll_number": 201,
+    "level": "300"
+  },
+  {
+    "student_name": "Amine Clodette",
+    "SWE210_mark": 87,
+    "MAE101_mark": 79,
+    "SWE200_mark": 90,
+    "roll_number": 202,
+    "level": "300"
+  },
+  {
+    "student_name": "TAMBE AYUK",
+    "SWE210_mark": 78,
+    "MAE101_mark": 90,
+    "SWE200_mark": 43,
+    "roll_number": 203,
+    "level": "300"
+  },
+  {
+    "student_name": "Orock Betrand",
+    "SWE210_mark": 89,
+    "MAE101_mark": 77,
+    "SWE200_mark": 92,
+    "roll_number": 204,
+    "level": "300"
+  }
+]

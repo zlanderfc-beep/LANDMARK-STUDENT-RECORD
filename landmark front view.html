@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Landmark Student Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="result_style.css">
+    <style>
+        /* Center and animate the logo in the logo-title-container */
+        .logo-title-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-title-container img {
+            display: block;
+            margin: 0 auto 10px auto;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%; /* Make it rounded */
+            box-shadow: 0 2px 16px #4e54c855;
+            animation: logoMoveY 1.9s linear infinite alternate; /* Animate in Y direction */
+        }
+        @keyframes logoMoveY {
+            0% { transform: translateY(-10px);}
+            100% { transform: translateY(10px);}
+        }
+
+        /* Scroll for All Students table if more than 6 rows */
+        #allStudents {
+            max-height: 288px; /* Approx 6 rows, adjust as needed */
+            overflow-y: auto;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(30,40,80,0.07);
+            transition: box-shadow 0.3s;
+        }
+        #allStudents table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #allStudents th, #allStudents td {
+            padding: 8px 12px;
+            text-align: center;
+        }
+        #allStudents tr:nth-child(even) {
+            background: #f7f9fc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container animated fadeIn">
+        <div style="position: absolute; top: 24px; left: 24px; z-index: 10;">
+            <button id="homeBtn" title="Home" style="background: none; border: none; cursor: pointer; padding: 0;">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 11.5L12 4l9 7.5" stroke="#1a237e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5 10.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9.5" stroke="#1a237e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        <div class="logo-title-container">
+            <img src="landmark logo 2.png" alt="Landmark Logo 2">
+            <h1>Landmark Student Management System</h1>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('add')">Add Student</button>
+            <button class="tab-btn" onclick="showTab('search')">Search Student</button>
+            <button class="tab-btn" onclick="showTab('all')">All Students</button>
+            <button class="tab-btn" onclick="showTab('average')">Calculate Average</button>
+        </div>
+        <div id="add" class="tab-content active">
+            <h2>Add / Update Student</h2>
+            <form id="addForm">
+                <input type="text" id="student_name" placeholder="Student Name" required>
+                <input type="number" id="roll_number" placeholder="Roll Number" min="0" max="99" required>
+                <input type="number" id="SWE210_mark" placeholder="SWE210 Mark" min="0" max="100" required>
+                <input type="number" id="MAE101_mark" placeholder="MAE101 Mark" min="0" max="100" required>
+                <input type="number" id="SWE200_mark" placeholder="SWE200 Mark" min="0" max="100" required>
+                <button type="submit">Add / Update</button>
+            </form>
+            <div id="addMsg"></div>
+        </div>
+        <div id="search" class="tab-content">
+            <h2>Search Student</h2>
+            <input type="number" id="search_roll" placeholder="Enter Roll Number">
+            <button onclick="searchStudent()">Search</button>
+            <div id="searchResult"></div>
+            <div id="downloadSection" style="display:none; margin-top: 20px; text-align:center;">
+                <button id="downloadBtn" class="download-animated">Download</button>
+                <div id="downloadOptions" class="download-options" style="display:none;">
+                    <button onclick="downloadStudentRecord('jpg')">JPG</button>
+                    <button onclick="downloadStudentRecord('png')">PNG</button>
+                    <button onclick="downloadStudentRecord('pdf')">PDF</button>
+                    <button onclick="downloadStudentRecord('bmp')">Bitmap</button>
+                </div>
+            </div>
+        </div>
+        <div id="all" class="tab-content">
+            <h2>All Students</h2>
+            <button onclick="loadAllStudents()">Refresh List</button>
+            <div id="allStudents"></div>
+        </div>
+        <div id="average" class="tab-content">
+            <h2>Calculate Average</h2>
+            <input type="number" id="avg_roll" placeholder="Enter Roll Number">
+            <button onclick="getAverage()">Calculate</button>
+            <div id="avgResult"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Get selected level from localStorage (default to 200)
+        const selectedLevel = localStorage.getItem('selectedLevel') || "200";
+        const API_BASE = "http://localhost:5500";
+
+        // Updated roll number ranges
+        const ROLL_RANGES = {
+            "200": { min: 1, max: 199 },
+            "300": { min: 200, max: 299 },
+            "400": { min: 300, max: 400 }
+        };
+
+        function isRollValid(roll, level) {
+            const { min, max } = ROLL_RANGES[level];
+            return roll >= min && roll <= max;
+        }
+
+        // Set roll number min/max attributes dynamically for Add, Search, and Average fields
+        function setRollNumberLimits() {
+            const { min, max } = ROLL_RANGES[selectedLevel];
+            const addRoll = document.getElementById('roll_number');
+            const searchRoll = document.getElementById('search_roll');
+            const avgRoll = document.getElementById('avg_roll');
+            if (addRoll) {
+                addRoll.min = min;
+                addRoll.max = max;
+                addRoll.placeholder = `Roll Number (${min}-${max})`;
+            }
+            if (searchRoll) {
+                searchRoll.min = min;
+                searchRoll.max = max;
+                searchRoll.placeholder = `Enter Roll Number (${min}-${max})`;
+            }
+            if (avgRoll) {
+                avgRoll.min = min;
+                avgRoll.max = max;
+                avgRoll.placeholder = `Enter Roll Number (${min}-${max})`;
+            }
+        }
+
+        // Call on page load
+        setRollNumberLimits();
+
+        // Add/Update Student
+        document.getElementById('addForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const roll = parseInt(document.getElementById('roll_number').value, 10);
+            if (!isRollValid(roll, selectedLevel)) {
+                document.getElementById('addMsg').innerHTML = `<span style="color:red">Roll number for level ${selectedLevel} must be between ${ROLL_RANGES[selectedLevel].min} and ${ROLL_RANGES[selectedLevel].max}.</span>`;
+                return;
+            }
+            const student = {
+                student_name: document.getElementById('student_name').value,
+                roll_number: roll,
+                SWE210_mark: Number(document.getElementById('SWE210_mark').value),
+                MAE101_mark: Number(document.getElementById('MAE101_mark').value),
+                SWE200_mark: Number(document.getElementById('SWE200_mark').value),
+                level: selectedLevel
+            };
+            try {
+                const res = await fetch(`${API_BASE}/students`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(student)
+                });
+                const data = await res.json();
+                document.getElementById('addMsg').innerHTML = data.message ? `<span style="color:green">${data.message}</span>` : `<span style="color:red">${data.error}</span>`;
+                this.reset();
+            } catch (err) {
+                document.getElementById('addMsg').innerHTML = "<span style='color:red;'>Error adding student.</span>";
+            }
+        };
+
+        // Search Student
+        async function searchStudent() {
+            const roll = parseInt(document.getElementById('search_roll').value, 10);
+            const resultDiv = document.getElementById('searchResult');
+            const downloadSection = document.getElementById('downloadSection');
+            if (!isRollValid(roll, selectedLevel)) {
+                resultDiv.innerHTML = `<span style="color:red">Roll number for level ${selectedLevel} must be between ${ROLL_RANGES[selectedLevel].min} and ${ROLL_RANGES[selectedLevel].max}.</span>`;
+                downloadSection.style.display = "none";
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/students/${roll}?level=${selectedLevel}`);
+                if (!response.ok) throw new Error('Student not found');
+                const student = await response.json();
+                // Calculate average and GPA
+                const marks = [student.SWE210_mark, student.MAE101_mark, student.SWE200_mark];
+                const avg = (marks.reduce((a, b) => a + b, 0) / marks.length).toFixed(2);
+                let gpa = 1;
+                if (avg >= 90) gpa = 4;
+                else if (avg >= 80) gpa = 3;
+                else if (avg >= 70) gpa = 2;
+                // Show result
+                resultDiv.innerHTML = `
+                    <div id="studentRecordPrint">
+                        <img src="landmark logo 2.png" class="watermark" alt="Watermark">
+                        <div class="header">
+                            <img src="landmark logo 2.png" alt="Landmark Logo">
+                            <h2>LANDMARK METROPOLITAN UNIVERSITY INSTITUTE</h2>
+                            <div class="info">
+                                landmark@gmail.com<br>
+                                Malingo street, Buea, Cameroon
+                            </div>
+                        </div>
+                        <table>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll Number</th>
+                                <th>SWE210</th>
+                                <th>MAE101</th>
+                                <th>SWE200</th>
+                            </tr>
+                            <tr>
+                                <td>${student.student_name}</td>
+                                <td>${student.roll_number}</td>
+                                <td>${student.SWE210_mark}</td>
+                                <td>${student.MAE101_mark}</td>
+                                <td>${student.SWE200_mark}</td>
+                            </tr>
+                        </table>
+                        <div class="summary">
+                            Average: <b>${avg}</b> &nbsp; | &nbsp; GPA: <b>${gpa}</b>
+                        </div>
+                    </div>
+                `;
+                downloadSection.style.display = "block";
+            } catch (err) {
+                resultDiv.innerHTML = "<span style='color:red;'>Student not found.</span>";
+                downloadSection.style.display = "none";
+            }
+            document.getElementById('downloadOptions').style.display = "none";
+        }
+
+        // Display All Students
+        async function loadAllStudents() {
+            const allDiv = document.getElementById('allStudents');
+            allDiv.innerHTML = "Loading...";
+            try {
+                const response = await fetch(`${API_BASE}/students?level=${selectedLevel}`);
+                const students = await response.json();
+                if (!Array.isArray(students) || students.length === 0) {
+                    allDiv.innerHTML = "<span style='color:red;'>No students found for this level.</span>";
+                    return;
+                }
+                let html = `<table><tr>
+                    <th>Name</th>
+                    <th>Roll Number</th>
+                    <th>SWE210</th>
+                    <th>MAE101</th>
+                    <th>SWE200</th>
+                </tr>`;
+                students.forEach(student => {
+                    html += `<tr>
+                        <td>${student.student_name}</td>
+                        <td>${student.roll_number}</td>
+                        <td>${student.SWE210_mark}</td>
+                        <td>${student.MAE101_mark}</td>
+                        <td>${student.SWE200_mark}</td>
+                    </tr>`;
+                });
+                html += "</table>";
+                allDiv.innerHTML = html;
+            } catch (err) {
+                allDiv.innerHTML = "<span style='color:red;'>Error loading students.</span>";
+            }
+        }
+
+        // Calculate Average for a Student
+        async function getAverage() {
+            const roll = parseInt(document.getElementById('avg_roll').value, 10);
+            const avgDiv = document.getElementById('avgResult');
+            avgDiv.innerHTML = "Calculating...";
+            if (!isRollValid(roll, selectedLevel)) {
+                avgDiv.innerHTML = `<span style="color:red">Roll number for level ${selectedLevel} must be between ${ROLL_RANGES[selectedLevel].min} and ${ROLL_RANGES[selectedLevel].max}.</span>`;
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/students/${roll}/average?level=${selectedLevel}`);
+                if (!response.ok) throw new Error('Student not found');
+                const data = await response.json();
+                avgDiv.innerHTML = `<span style="color:green;">Average: ${data.average.toFixed(2)}</span>`;
+            } catch (err) {
+                avgDiv.innerHTML = "<span style='color:red;'>Student not found or error calculating average.</span>";
+            }
+        }
+
+        // Download button logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadOptions = document.getElementById('downloadOptions');
+            if (downloadBtn) {
+                downloadBtn.onclick = function() {
+                    downloadOptions.style.display = downloadOptions.style.display === "none" ? "flex" : "none";
+                };
+            }
+        });
+
+        // Download function for different formats
+        function downloadStudentRecord(format) {
+            const node = document.getElementById('studentRecordPrint');
+            if (!node) return;
+            html2canvas(node, {backgroundColor: "#fff"}).then(canvas => {
+                if (format === 'jpg' || format === 'png' || format === 'bmp') {
+                    let mime = 'image/png';
+                    if (format === 'jpg') mime = 'image/jpeg';
+                    if (format === 'bmp') mime = 'image/bmp';
+                    const link = document.createElement('a');
+                    link.download = `student_record.${format}`;
+                    link.href = canvas.toDataURL(mime);
+                    link.click();
+                } else if (format === 'pdf') {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new window.jspdf.jsPDF({
+                        orientation: 'portrait',
+                        unit: 'pt',
+                        format: 'a4'
+                    });
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    // Calculate image size to fit page
+                    const imgProps = pdf.getImageProperties(imgData);
+                    let pdfWidth = pageWidth - 60;
+                    let pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                    if (pdfHeight > pageHeight - 60) {
+                        pdfHeight = pageHeight - 60;
+                        pdfWidth = (imgProps.width * pdfHeight) / imgProps.height;
+                    }
+                    pdf.addImage(imgData, 'PNG', (pageWidth - pdfWidth) / 2, 30, pdfWidth, pdfHeight);
+                    pdf.save('student_record.pdf');
+                }
+            });
+        }
+
+        // Home button logic
+        document.getElementById('homeBtn').onclick = function() {
+            window.location.href = "LSMS_Landing.html";
+        };
+
+        // Tab switching logic for main sections
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.display = 'none';
+            });
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show the selected tab content
+            const tabContent = document.getElementById(tabId);
+            if (tabContent) {
+                tabContent.classList.add('active');
+                tabContent.style.display = 'block';
+            }
+
+            // Set active class on the clicked button
+            const btnIndex = { add: 0, search: 1, all: 2, average: 3 }[tabId];
+            if (typeof btnIndex !== "undefined") {
+                document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+            }
+
+            // Optionally reset or refresh content for each tab
+            if (tabId === 'all') {
+                loadAllStudents();
+            }
+            if (tabId === 'search') {
+                document.getElementById('searchResult').innerHTML = '';
+                document.getElementById('downloadSection').style.display = "none";
+            }
+            if (tabId === 'add') {
+                document.getElementById('addMsg').innerHTML = '';
+            }
+            if (tabId === 'average') {
+                document.getElementById('avgResult').innerHTML = '';
+            }
+        }
+
+        // Attach event listeners to tab buttons
+        document.querySelector('.tab-btn[onclick*="showTab(\'add\')"]').onclick = function() { showTab('add'); };
+        document.querySelector('.tab-btn[onclick*="showTab(\'search\')"]').onclick = function() { showTab('search'); };
+        document.querySelector('.tab-btn[onclick*="showTab(\'all\')"]').onclick = function() { showTab('all'); };
+        document.querySelector('.tab-btn[onclick*="showTab(\'average\')"]').onclick = function() { showTab('average'); };
+
+        // On page load, show the default tab
+        showTab('add');
+    </script>
+    </body>
+</html>

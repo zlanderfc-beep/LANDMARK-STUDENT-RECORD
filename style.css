@@ -1,0 +1,122 @@
+body {
+    background: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.container {
+    background: rgba(255,255,255,0.97);
+    max-width: 600px;
+    margin: 40px auto 0 auto;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(30,60,114,0.2);
+    padding: 30px 40px 40px 40px;
+    animation: fadeIn 1s;
+}
+
+h1 {
+    text-align: center;
+    color: #1e3c72;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.tab-btn {
+    background: #2a5298;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    margin: 0 4px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.tab-btn.active, .tab-btn:hover {
+    background: #1e3c72;
+    transform: translateY(-2px) scale(1.05);
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.7s;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+form input, form button, input[type="number"] {
+    display: block;
+    width: 100%;
+    margin: 12px 0;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: 1px solid #b0c4de;
+    transition: border 0.2s;
+}
+
+form input:focus {
+    border: 1.5px solid #1e3c72;
+    outline: none;
+}
+
+form button, button {
+    background: #1e3c72;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.07);
+}
+
+form button:hover, button:hover {
+    background: #2a5298;
+}
+
+#addMsg, #searchResult, #avgResult {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #1e3c72;
+}
+
+#allStudents {
+    margin-top: 15px;
+}
+
+.student-card {
+    background: #f7fafd;
+    border: 1px solid #e3eafc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.06);
+    transition: box-shadow 0.2s;
+    animation: fadeInUp 0.5s;
+}
+
+.student-card:hover {
+    box-shadow: 0 6px 24px rgba(30,60,114,0.13);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px);}
+    to { opacity: 1; transform: translateY(0);}
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px);}
+    to { opacity: 1; transform: translateY(0);}
+}
