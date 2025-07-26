@@ -209,8 +209,8 @@ app.post('/api/lecturer/signup', async (req, res) => {
             subject: 'Welcome to Landmark Student Management System',
             html: htmlContent,
             attachments: [{
-                filename: 'landmark logo 2.png',
-                path: path.join(__dirname, 'landmark logo 2.png'),
+                filename: 'landmarklogo2.png',
+                path: path.join(__dirname, 'landmarklogo2.png'),
                 cid: 'landmarklogo'
             }]
         };
@@ -437,8 +437,8 @@ app.post('/api/lecturer/forgot-password', async (req, res) => {
             subject: 'Your LSMS Account Credentials',
             html: htmlContent,
             attachments: [{
-                filename: 'landmark logo 2.png',
-                path: path.join(__dirname, 'landmark logo 2.png'),
+                filename: 'landmarklogo2.png',
+                path: path.join(__dirname, 'landmarklogo2.png'),
                 cid: 'landmarklogo'
             }]
         };
