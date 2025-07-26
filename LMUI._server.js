@@ -17,7 +17,10 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.static(PROJECT_DIR));
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.urlencoded({ limit: '10mb', extended: true}));
+
+// Increase payload size if needed
+app.use(express.json({ limit: '2mb' }));
 
 // File mapping for each level
 const STUDENT_FILES = {
@@ -522,5 +525,29 @@ app.post('/api/send-kyc-email', async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// --- OTP Email Endpoint ---
+app.post('/api/send-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    try {
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'obaseviv@gmail.com',
+                pass: 'xpxzxtyzxfldbaww'
+            }
+        });
+        const mailOptions = {
+            from: '"Landmark Student Record" <obaseviv@gmail.com>',
+            to: email,
+            subject: 'Your LSMS Login OTP',
+            text: `Your LSMS login OTP is: ${otp}\n\nThis code is valid for 1 minute.`,
+        };
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to send OTP." });
     }
 });
