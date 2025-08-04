@@ -483,6 +483,22 @@ app.post('/api/admin/check-pass', (req, res) => {
     res.json({ success: found });
 });
 
+// Lecturer email check endpoint
+app.post('/api/lecturer/check-email', (req, res) => {
+    const { email } = req.body;
+    const lecturerPath = path.join(__dirname, 'Lecturer.json');
+    let exists = false;
+    if (fs.existsSync(lecturerPath)) {
+        try {
+            const lecturers = JSON.parse(fs.readFileSync(lecturerPath, 'utf8'));
+            exists = lecturers.some(l => l.email && l.email.toLowerCase() === email.toLowerCase());
+        } catch (err) {
+            exists = false;
+        }
+    }
+    res.json({ exists });
+});
+
 // --- KYC Verification Email Endpoint ---
 app.post('/api/send-kyc-email', async (req, res) => {
     const { adminEmail, userEmail, image } = req.body;
@@ -528,26 +544,97 @@ app.post('/api/send-kyc-email', async (req, res) => {
     }
 });
 
-// --- OTP Email Endpoint ---
-app.post('/api/send-otp', async (req, res) => {
-    const { email, otp } = req.body;
+const fs = require('fs');
+const path = require('path');
+const nodemailer = require('nodemailer');
+
+// Helper: Generate secure random 4-digit OTP
+function generateOtp() {
+    return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+// Send OTP email
+async function sendOtpEmail(email, otp) {
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'obaseviv@gmail.com',
+            pass: 'xpxzxtyzxfldbaww'
+        }
+    });
+    const mailOptions = {
+        from: '"Landmark Student Record" <obaseviv@gmail.com>',
+        to: email,
+        subject: 'Your LSMS Login OTP',
+        text: `Your LSMS login OTP is: ${otp}\n\nThis code is valid for 1 minute.`,
+    };
+    await transporter.sendMail(mailOptions);
+}
+
+// Send OTP and store in temp file
+app.post('/api/lecturer/send-otp', async (req, res) => {
+    const { email } = req.body;
+    const lecturerPath = path.join(__dirname, 'Lecturer.json');
+    const otpTempPath = path.join(__dirname, 'otp_temp.json');
+    let exists = false;
+    if (fs.existsSync(lecturerPath)) {
+        try {
+            const lecturers = JSON.parse(fs.readFileSync(lecturerPath, 'utf8'));
+            exists = lecturers.some(l => l.email && l.email.toLowerCase() === email.toLowerCase());
+        } catch (err) {
+            exists = false;
+        }
+    }
+    if (!exists) return res.json({ success: false, error: "Email not found in lecturer records." });
+
+    const otp = generateOtp();
+    const expires = Date.now() + 60000; // 1 minute
+    // Store OTP in temp file
+    let otpData = {};
+    if (fs.existsSync(otpTempPath)) {
+        try {
+            otpData = JSON.parse(fs.readFileSync(otpTempPath, 'utf8'));
+        } catch (err) { otpData = {}; }
+    }
+    otpData[email.toLowerCase()] = { otp, expires };
+    fs.writeFileSync(otpTempPath, JSON.stringify(otpData, null, 2));
     try {
-        let transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'obaseviv@gmail.com',
-                pass: 'xpxzxtyzxfldbaww'
-            }
-        });
-        const mailOptions = {
-            from: '"Landmark Student Record" <obaseviv@gmail.com>',
-            to: email,
-            subject: 'Your LSMS Login OTP',
-            text: `Your LSMS login OTP is: ${otp}\n\nThis code is valid for 1 minute.`,
-        };
-        await transporter.sendMail(mailOptions);
+        await sendOtpEmail(email, otp);
         res.json({ success: true });
     } catch (err) {
-        res.status(500).json({ error: "Failed to send OTP." });
+        res.json({ success: false, error: "Failed to send OTP email." });
     }
+});
+
+// Validate OTP
+app.post('/api/lecturer/validate-otp', (req, res) => {
+    const { email, otp } = req.body;
+    const lecturerPath = path.join(__dirname, 'Lecturer.json');
+    const otpTempPath = path.join(__dirname, 'otp_temp.json');
+    let exists = false;
+    if (fs.existsSync(lecturerPath)) {
+        try {
+            const lecturers = JSON.parse(fs.readFileSync(lecturerPath, 'utf8'));
+            exists = lecturers.some(l => l.email && l.email.toLowerCase() === email.toLowerCase());
+        } catch (err) {
+            exists = false;
+        }
+    }
+    if (!exists) return res.json({ success: false, error: "Lecturer email not found." });
+
+    let otpData = {};
+    if (fs.existsSync(otpTempPath)) {
+        try {
+            otpData = JSON.parse(fs.readFileSync(otpTempPath, 'utf8'));
+        } catch (err) { otpData = {}; }
+    }
+    const record = otpData[email.toLowerCase()];
+    if (!record) return res.json({ success: false, error: "No OTP found. Please request a new code." });
+    if (Date.now() > record.expires) return res.json({ success: false, error: "OTP expired. Please request a new code." });
+    if (record.otp !== otp) return res.json({ success: false, error: "Incorrect OTP." });
+
+    // Optionally, remove OTP after successful validation
+    delete otpData[email.toLowerCase()];
+    fs.writeFileSync(otpTempPath, JSON.stringify(otpData, null, 2));
+    res.json({ success: true });
 });
