@@ -85,5 +85,13 @@
     "SWE200_mark": 88,
     "roll_number": 12,
     "level": "200"
+  },
+  {
+    "student_name": "Chris Alcantara",
+    "SWE210_mark": 89,
+    "MAE101_mark": 90,
+    "SWE200_mark": 77,
+    "roll_number": 11,
+    "level": "200"
   }
 ]
