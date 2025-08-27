@@ -20,5 +20,15 @@
     "port": "^0.8.1",
     "server": "^0.0.3"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zlanderfc-beep/LANDMARK-STUDENT-RECORD.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/zlanderfc-beep/LANDMARK-STUDENT-RECORD/issues"
+  },
+  "homepage": "https://github.com/zlanderfc-beep/LANDMARK-STUDENT-RECORD#readme"
 }
