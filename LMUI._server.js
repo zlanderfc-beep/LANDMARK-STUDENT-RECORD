@@ -389,7 +389,7 @@ app.get('/api/class-list', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://192.168.43.60:${PORT}`);
 });
 
 app.post('/api/lecturer/forgot-password', async (req, res) => {
